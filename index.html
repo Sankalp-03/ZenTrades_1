@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorted Products</title>
+</head>
+<body>
+  <div id="productList"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    async function fetchData() {
+      try {
+        const response = await axios.get('https://s3.amazonaws.com/open-to-cors/assignment.json');
+        const products = response.data.products;
+
+        // Convert the object into an array for sorting
+        const productsArray = Object.keys(products).map(key => ({
+          id: key,
+          subcategory: products[key].subcategory,
+          title: products[key].title,
+          price: parseInt(products[key].price),
+          popularity: parseInt(products[key].popularity)
+        }));
+
+        // Sort products by popularity in descending order
+        productsArray.sort((a, b) => b.popularity - a.popularity);
+
+        // Display products sorted by popularity
+        const productListDiv = document.getElementById('productList');
+        const productListHTML = '<h2>Products sorted by descending popularity:</h2>' +
+          productsArray.map(product => `
+            <p>Title: ${product.title}, Price: ${product.price}, Popularity: ${product.popularity}</p>
+          `).join('');
+
+        productListDiv.innerHTML = productListHTML;
+
+        // Optionally, return the sorted array for further manipulation or display
+        return productsArray;
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+      }
+    }
+    fetchData();
+  </script>
+</body>
+</html>
